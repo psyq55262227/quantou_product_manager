@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 // 连接数据库
 mongoose
@@ -40,10 +40,10 @@ const Product = mongoose.model(
       pull_data: {
         type: Number,
       },
-      info: {
-        type: Array,
-        required: true,
-      },
+      // info: {
+      //   type: Array,
+      //   required: true,
+      // },
       status: {
         type: Number, // 0 待审核 1 不通过 2 通过
         required: true,
@@ -147,5 +147,4 @@ const Score = mongoose.model(
   )
 );
 
-// module.exports = { User, Product, Score, After };
-export { User, Product, Score, After };
+module.exports = { User, Product, Score, After };

@@ -20,7 +20,7 @@ export default () => {
           <Input placeholder='请输入产品名' />
         </FormItem>
         <FormItem label='产品图片地址' rules={[{ required: true }]}>
-          <Input placeholder='请输入产品图片地址' />
+          <Input placeholder='请输入产品图片地址' defaultValue="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp" />
         </FormItem>
         <FormItem label='产品描述' rules={[{ required: true }]}>
           <Input placeholder='请输入产品描述' />
@@ -41,21 +41,29 @@ export default () => {
                               rules={[{ required: true }]}
                               noStyle
                             >
-                              <DatePicker.YearPicker placeholder='请输入产品数据' />
+                              <DatePicker.YearPicker placeholder='请输入年份' />
                             </Form.Item>
                             <Form.Item
                               field={item.field + '.cost'}
                               rules={[{ required: true }]}
                               noStyle
                             >
-                              <InputNumber placeholder="请输入年成本" min={0} suffix={'￥'} />
+                              <InputNumber placeholder="请输入该年成本" min={0} suffix={'￥'} />
                             </Form.Item>
                             <Form.Item
                               field={item.field + '.profit'}
                               rules={[{ required: true }]}
                               noStyle
                             >
-                              <InputNumber placeholder="请输入年利润" suffix={'￥'} />
+                              <InputNumber placeholder="请输入该年利润" suffix={'￥'} />
+                            </Form.Item>
+                            <Form.Item
+                              field={item.field + '.price'}
+                              rules={[{ required: true }]}
+                              noStyle
+                            >
+                              <Checkbox>该年获奖</Checkbox>
+                              {/* <InputNumber placeholder="请输入该年利润" suffix={'￥'} /> */}
                             </Form.Item>
                             <Button
                               icon={<IconDelete />}

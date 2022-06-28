@@ -1,8 +1,7 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import http from 'http';
-import { User, Product, Score, After } from './model.js';
-import { db } from './redis.js';
+const express = require('express');
+const bodyParser = require('body-parser');
+const http = require('http');
+const { User, Product, Score, After } = require('./model.js');
 const app = express();
 const server = http.createServer(app);
 app.use(bodyParser.json());
@@ -44,7 +43,8 @@ const auth = async (req, res, next) => {
 };
 // 注册
 app.post('/signup', async (req, res) => {
-  const { username, password, sign, uid } = req.body;
+  const { username, password, sign } = req.body;
+  // 用户名不重复
   const user = await User.findOne({
     username,
   });
@@ -55,7 +55,7 @@ app.post('/signup', async (req, res) => {
   }
   // 创建用户
   User.create({
-    uid,
+    uid: new Date().getTime(),
     username,
     password,
     sign,
@@ -104,14 +104,36 @@ app.post('/login', async (req, res) => {
 app.get('/product', auth, async (req, res) => {
   const { pid } = req.params;
   try {
-    if (pid) {
-      const product = await Product.findOne({ pid });
-      if (product) return res.send(product);
+    // 获取产品列表
+    if (!pid) {
+      const product = await Product.find();
+      const score = await Score.find();
+      if (!product || !score)
+        return res.status(500).send({
+          message: '未找到该产品',
+        });
+      const result = product.map((item) => {
+        const { pid } = item;
+        const relativeScore = score.filter((item) => item.pid === pid);
+        return {
+          ...item,
+          relativeScore,
+        };
+      });
+      return res.send(result);
+    }
+    // 获取单个产品信息
+    const product = await Product.findOne({ pid });
+    const score = await Score.find({ pid });
+    if (!product || !score)
       return res.status(422).send({
         message: '未找到该产品',
       });
-    }
-    return await Product.find();
+    const result = {
+      ...product,
+      score,
+    };
+    return res.send(result);
   } catch (e) {
     return res.status(500).send({
       message: '服务出错',
@@ -121,22 +143,36 @@ app.get('/product', auth, async (req, res) => {
 // 添加产品
 app.post('/product/add', auth, async (req, res) => {
   const { uid } = req.user;
-  const { pid, pname, intro, info } = req.body;
+  const { pname, intro, info } = req.body;
   try {
     const product = await Product.create({
-      pid,
+      pid: new Date().getTime(),
       uid,
       pname,
       intro,
       put_data: -1,
       pull_data: -1,
-      info,
       status: 0,
     });
-    if (product) return res.send({ message: 'ok' });
-    return res.status(500).send({
-      message: '服务出错',
+    if (!product)
+      return res.status(500).send({
+        message: '服务出错',
+      });
+    info.map(async ({ price, profit, cost, year }) => {
+      const after = await After.create({
+        price,
+        profit,
+        cost,
+        rate: (profit / cost).toFixed(2),
+        year,
+        aid: new Date().getTime(),
+      });
+      if (!after)
+        return res.status(500).send({
+          message: '服务出错',
+        });
     });
+    return res.send({ message: 'ok' });
   } catch (e) {
     console.log(e);
     return res.status(500).send({
@@ -148,7 +184,7 @@ app.post('/product/add', auth, async (req, res) => {
 app.post('/product/check', auth, async (req, res) => {
   const { sign } = req.user;
   if (!sign)
-    return res.send(403).send({
+    return res.status(403).send({
       message: '您暂时没有访问该接口的权限',
     });
   const { pid, isPass } = req.body;
@@ -167,9 +203,7 @@ app.post('/product/check', auth, async (req, res) => {
       }
     );
     console.log(product);
-    if (product) {
-      return res.send({ message: 'ok' });
-    }
+    if (product) return res.send({ message: 'ok' });
     return res.status(422).send({
       message: '不存在该产品或操作失败',
     });
@@ -180,30 +214,32 @@ app.post('/product/check', auth, async (req, res) => {
     });
   }
 });
-// // 下架
-// app.post('/product/off', auth, async (req, res) => {
-//   const { sign } = req.user;
-//   if (!sign)
-//     return res.send(403).send({
-//       message: '您暂时没有访问该接口的权限',
-//     });
-//   const { pid } = req.body;
-//   try {
-//     const product = await Product.findByIdAndUpdate({pid},{status:1,});
-//     console.log(product);
-//     if (product) {
-//       return res.send({ message: 'ok' });
-//     }
-//     return res.status(422).send({
-//       message: '不存在该产品或下架失败',
-//     });
-//   } catch (e) {
-//     console.log(e);
-//     return res.status(500).send({
-//       message: '服务出错',
-//     });
-//   }
-// });
+// 评委评分
+app.post('/product/score', auth, async (req, res) => {
+  const { sign, uid } = req.user;
+  if (!sign)
+    return res.status(403).send({
+      message: '您暂时没有访问该接口的权限',
+    });
+  const { pid, sc } = req.body;
+  try {
+    const score = await Score.create({
+      sid: new Date().getTime(),
+      sc,
+      pid,
+      bid: uid,
+    });
+    if (score) return res.send({ message: 'ok' });
+    return res.status(422).send({
+      message: '不存在该产品或操作失败',
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      message: '服务出错',
+    });
+  }
+});
 
 server.listen(3001);
 console.log('网站服务器启动成功');
