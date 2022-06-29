@@ -1,0 +1,12 @@
+@url=http://localhost:3001
+@json=Content-Type: application/json
+
+### 创建用户
+post {{url}}/signup
+{{json}}
+
+{
+    "username": "user",
+    "password":"user",
+    "sign":false
+}

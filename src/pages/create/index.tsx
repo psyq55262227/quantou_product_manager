@@ -1,28 +1,38 @@
+import { apiPOST } from "@/api";
 import { Form, Input, Checkbox, Button, Card, Space, DatePicker, InputNumber } from "@arco-design/web-react"
 import { IconDelete } from "@arco-design/web-react/icon";
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 const FormItem = Form.Item;
-const TextArea = Input.TextArea;
+// const TextArea = Input.TextArea;
 
 export default () => {
   const formRef = useRef();
+  const [formData, setFormData] = useState();
+  const handleCreateProduct = async () => {
+    try {
+      const data = await apiPOST('/product/add', formData);
+      console.log(data)
+    } catch (e) {
+      console.log(e)
+    }
+  }
   return (
     <Card>
       <Form
         layout="horizontal"
         ref={formRef}
         onValuesChange={(_, v) => {
-          console.log(_, v);
+          setFormData(v);
         }}
       >
         <FormItem
-          label='产品名' field='productname' rules={[{ required: true }]}>
+          label='产品名' field='pname' rules={[{ required: true }]}>
           <Input placeholder='请输入产品名' />
         </FormItem>
-        <FormItem label='产品图片地址' rules={[{ required: true }]}>
+        {/* <FormItem field="pic" label='产品图片地址' rules={[{ required: true }]}>
           <Input placeholder='请输入产品图片地址' defaultValue="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp" />
-        </FormItem>
-        <FormItem label='产品描述' rules={[{ required: true }]}>
+        </FormItem> */}
+        <FormItem label='产品描述' field="intro" rules={[{ required: true }]}>
           <Input placeholder='请输入产品描述' />
           {/* <TextArea allowClear placeholder='请输入产品描述' style={{ minHeight: 64, width: 350 }} autoSize /> */}
         </FormItem>
@@ -95,7 +105,7 @@ export default () => {
             offset: 5,
           }}
         >
-          <Button type='primary' htmlType='submit'>
+          <Button type='primary' htmlType='submit' onClick={() => handleCreateProduct()}>
             提交产品信息
           </Button>
         </FormItem>

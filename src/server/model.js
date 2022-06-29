@@ -68,7 +68,7 @@ const User = mongoose.model(
       password: {
         type: String,
         required: true,
-        select: false,
+        // select: false,
         // 每次设置pwd都要加密
         set(val) {
           const salt = bcrypt.genSaltSync(10);
@@ -78,7 +78,7 @@ const User = mongoose.model(
       // 是否为管理
       sign: {
         type: Boolean,
-        required: true,
+        // required: true,
       },
     },
     // todo的创建时间和修改时间

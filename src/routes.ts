@@ -20,10 +20,6 @@ export const routes: Route[] = [
     ],
   },
   {
-    name: 'Example',
-    key: 'example',
-  },
-  {
     name: '产品列表',
     key: 'productList',
     // children: [

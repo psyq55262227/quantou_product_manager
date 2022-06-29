@@ -1,8 +1,11 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const http = require('http');
-const { User, Product, Score, After } = require('./model.js');
 const app = express();
+const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+const { User, Todo } = require('./model');
+const jwt = require('jsonwebtoken');
+const jwtKey = 'lc098023suosi';
+const http = require('http');
 const server = http.createServer(app);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -24,7 +27,7 @@ const auth = async (req, res, next) => {
   // 无token或token invalid都返回无效
   if (!token)
     return res.status(422).send({
-      message: '无权限',
+      message: '无权限，请先登录',
     });
   const { uid } = jwt.verify(token, jwtKey);
   if (!uid) {
@@ -36,7 +39,7 @@ const auth = async (req, res, next) => {
   // 如果不存在对应用户，也不予通过
   if (!user)
     return res.status(422).send({
-      message: '用户不存在',
+      message: '用户不存在，请确认输入信息',
     });
   req.user = user;
   next();
@@ -50,12 +53,13 @@ app.post('/signup', async (req, res) => {
   });
   if (user) {
     return res.status(422).send({
-      message: '用户已存在',
+      message: '用户名已存在，请更换用户名',
     });
   }
+  const uid = new Date().getTime();
   // 创建用户
-  User.create({
-    uid: new Date().getTime(),
+  await User.create({
+    uid,
     username,
     password,
     sign,
@@ -83,8 +87,8 @@ app.post('/login', async (req, res) => {
     });
   }
   // 翻译密码，检查密码是否正确
-  const isPwdVaild = bcrypt.compareSync(req.body.pwd, user.pwd);
-  if (!isPwdVaild) {
+  const ispasswordVaild = bcrypt.compareSync(req.body.password, user.password);
+  if (!ispasswordVaild) {
     return res.status(422).send({
       message: '密码错误',
     });
@@ -139,6 +143,9 @@ app.get('/product', auth, async (req, res) => {
       message: '服务出错',
     });
   }
+});
+app.get('/user/userinfo', auth, async (req, res) => {
+  res.send(req.user);
 });
 // 添加产品
 app.post('/product/add', auth, async (req, res) => {

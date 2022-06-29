@@ -4,8 +4,6 @@ import {
   Avatar,
   Dropdown,
   Menu,
-  Divider,
-  Message,
   Button,
 } from '@arco-design/web-react';
 import {
@@ -17,6 +15,7 @@ import {
   IconTag,
 } from '@arco-design/web-react/icon';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom'
 import { GlobalState } from '@/store';
 import { GlobalContext } from '@/context';
 import useLocale from '@/utils/useLocale';
@@ -26,27 +25,28 @@ import styles from './style/index.module.less';
 import useStorage from '@/utils/useStorage';
 import { generatePermission } from '@/routes';
 import Settings from '../Settings';
+import { delToken } from '@/utils/token';
 
 function Navbar({ show }: { show: boolean }) {
   const t = useLocale();
   const userInfo = useSelector((state: GlobalState) => state.userInfo);
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const [_, setUserStatus] = useStorage('userStatus');
   const [role, setRole] = useStorage('userRole', 'admin');
 
-  const { setLang, lang, theme, setTheme } = useContext(GlobalContext);
+  const { theme, setTheme } = useContext(GlobalContext);
 
-  function logout() {
-    setUserStatus('logout');
-    window.location.href = '/login';
+  const logout = () => {
+    delToken();
+    history.push('/login')
   }
 
   function onMenuItemClick(key) {
-    if (key === 'logout') {
-      logout();
-    } else {
-      Message.info(`You clicked ${key}`);
+    switch (key) {
+      case 'logout':
+        logout();
     }
   }
 
@@ -74,33 +74,8 @@ function Navbar({ show }: { show: boolean }) {
     );
   }
 
-  const handleChangeRole = () => {
-    const newRole = role === 'admin' ? 'user' : 'admin';
-    setRole(newRole);
-  };
-
   const droplist = (
     <Menu onClickMenuItem={onMenuItemClick}>
-      <Menu.SubMenu
-        key="role"
-        title={
-          <>
-            <IconUser className={styles['dropdown-icon']} />
-            <span className={styles['user-role']}>
-              {role === 'admin'
-                ? t['menu.user.role.admin']
-                : t['menu.user.role.user']}
-            </span>
-          </>
-        }
-      >
-        <Menu.Item onClick={handleChangeRole} key="switch role">
-          <IconTag className={styles['dropdown-icon']} />
-          {t['menu.user.switchRoles']}
-        </Menu.Item>
-      </Menu.SubMenu>
-
-      <Divider style={{ margin: '4px 0' }} />
       <Menu.Item key="logout">
         <IconPoweroff className={styles['dropdown-icon']} />
         {t['navbar.logout']}

@@ -12,10 +12,11 @@ import rootReducer from './store';
 import PageLayout from './layout';
 import { GlobalContext } from './context';
 import Login from './pages/login';
-import checkLogin from './utils/checkLogin';
+
 import changeTheme from './utils/changeTheme';
 import useStorage from './utils/useStorage';
 import './mock';
+import { getToken } from './utils/token';
 
 const store = createStore(rootReducer);
 
@@ -35,7 +36,7 @@ function Index() {
   }
 
   function fetchUserInfo() {
-    axios.get('/api/user/userInfo').then((res) => {
+    axios.get('/user/userinfo').then((res) => {
       store.dispatch({
         type: 'update-userInfo',
         payload: { userInfo: res.data },
@@ -44,10 +45,8 @@ function Index() {
   }
 
   useEffect(() => {
-    if (checkLogin()) {
+    if (getToken()) {
       fetchUserInfo();
-    } else if (window.location.pathname.replace(/\//g, '') !== 'login') {
-      window.location.pathname = '/login';
     }
   }, []);
 

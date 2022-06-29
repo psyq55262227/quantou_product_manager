@@ -14,11 +14,17 @@ import useStorage from '@/utils/useStorage';
 import useLocale from '@/utils/useLocale';
 import locale from './locale';
 import styles from './style/index.module.less';
+import { apiPOST } from '@/api';
+import { setToken } from '@/utils/token';
+import Register from './register';
+import { useHistory } from 'react-router-dom'
 
 export default function LoginForm() {
   const formRef = useRef<FormInstance>();
+  const [visible, setVisible] = useState(false)
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const history = useHistory();
   const [loginParams, setLoginParams, removeLoginParams] =
     useStorage('loginParams');
 
@@ -26,39 +32,29 @@ export default function LoginForm() {
 
   const [rememberPassword, setRememberPassword] = useState(!!loginParams);
 
-  function afterLoginSuccess(params) {
-    // 记住密码
-    if (rememberPassword) {
-      setLoginParams(JSON.stringify(params));
-    } else {
-      removeLoginParams();
-    }
-    // 记录登录状态
-    localStorage.setItem('userStatus', 'login');
-    // 跳转首页
-    window.location.href = '/';
-  }
-
-  function login(params) {
+  const login = async (params) => {
     setErrorMessage('');
     setLoading(true);
-    axios
-      .post('/api/user/login', params)
-      .then((res) => {
-        const { status, msg } = res.data;
-        if (status === 'ok') {
-          afterLoginSuccess(params);
-        } else {
-          setErrorMessage(msg || t['login.form.login.errMsg']);
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    try {
+      const { data: { token } } = await apiPOST('/login', params);
+      setToken(token);
+      if (rememberPassword) {
+        setLoginParams(JSON.stringify(params));
+      } else {
+        removeLoginParams();
+      }
+      history.push('/')
+    } catch (e) {
+      console.log(e)
+      setErrorMessage(t['login.form.login.errMsg']);
+    }
+    setLoading(false)
   }
 
   function onSubmitClick() {
     formRef.current.validate().then((values) => {
+      console.log(values)
+      console.log(new Date().getTime())
       login(values);
     });
   }
@@ -84,15 +80,15 @@ export default function LoginForm() {
         className={styles['login-form']}
         layout="vertical"
         ref={formRef}
-        initialValues={{ userName: 'admin', password: 'admin' }}
+        initialValues={{ username: 'admin', password: 'admin' }}
       >
         <Form.Item
-          field="userName"
-          rules={[{ required: true, message: t['login.form.userName.errMsg'] }]}
+          field="username"
+          rules={[{ required: true, message: t['login.form.username.errMsg'] }]}
         >
           <Input
             prefix={<IconUser />}
-            placeholder={t['login.form.userName.placeholder']}
+            placeholder={t['login.form.username.placeholder']}
             onPressEnter={onSubmitClick}
           />
         </Form.Item>
@@ -119,12 +115,14 @@ export default function LoginForm() {
           <Button
             type="text"
             long
+            onClick={() => setVisible(true)}
             className={styles['login-form-register-btn']}
           >
             {t['login.form.register']}
           </Button>
         </Space>
       </Form>
+      <Register visible={visible} setVisible={setVisible} />
     </div>
   );
 }
