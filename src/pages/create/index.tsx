@@ -1,17 +1,30 @@
 import { apiPOST } from "@/api";
-import { Form, Input, Checkbox, Button, Card, Space, DatePicker, InputNumber } from "@arco-design/web-react"
+import { Form, Input, Checkbox, Button, Card, Space, DatePicker, InputNumber, Message } from "@arco-design/web-react"
 import { IconDelete } from "@arco-design/web-react/icon";
 import React, { useRef, useState } from "react"
+import { useHistory } from 'react-router-dom'
 const FormItem = Form.Item;
 // const TextArea = Input.TextArea;
 
 export default () => {
   const formRef = useRef();
   const [formData, setFormData] = useState();
+  const history = useHistory();
   const handleCreateProduct = async () => {
     try {
-      const data = await apiPOST('/product/add', formData);
-      console.log(data)
+      console.log(formData)
+      const { info } = formData;
+      const yearMap = new Map();
+      if (!info) return Message.error('请填写完整信息')
+      for (let i = 0; i < info.length; i++) {
+        const { year, cost, profit } = info[i];
+        if (!year || !cost || !profit) return Message.error('请填写完整信息')
+        if (yearMap.has(year)) return Message.error('年利率信息请勿重复填写年份')
+        yearMap.set(year, year)
+      }
+      await apiPOST('/product/add', formData);
+      Message.success('创建产品成功')
+      history.push('/')
     } catch (e) {
       console.log(e)
     }
@@ -47,7 +60,7 @@ export default () => {
                         <Form.Item label={'年利率信息 ' + (index + 1)} rules={[{ required: true }]}>
                           <Space>
                             <Form.Item
-                              field={item.field + '.date'}
+                              field={item.field + '.year'}
                               rules={[{ required: true }]}
                               noStyle
                             >

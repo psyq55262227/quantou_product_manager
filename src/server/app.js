@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
-const { User, Todo } = require('./model');
+const { User, Product, After, Score } = require('./model');
 const jwt = require('jsonwebtoken');
 const jwtKey = 'lc098023suosi';
 const http = require('http');
@@ -96,7 +96,7 @@ app.post('/login', async (req, res) => {
   // 发放token
   const token = `Bearer ${jwt.sign(
     {
-      uid: String(req.body.uid),
+      uid: String(user.uid),
     },
     jwtKey
   )}`;
@@ -106,54 +106,94 @@ app.post('/login', async (req, res) => {
 });
 // 获取产品
 app.get('/product', auth, async (req, res) => {
-  const { pid } = req.params;
+  const { pid } = req.query;
   try {
     // 获取产品列表
     if (!pid) {
-      const product = await Product.find();
+      const product = (await Product.find()).map(
+        ({ pid, pname, intro, put_data, pull_data, status }) => ({
+          pid,
+          pname,
+          intro,
+          put_data,
+          pull_data,
+          status,
+        })
+      );
       const score = await Score.find();
-      if (!product || !score)
-        return res.status(500).send({
+      const after = (await After.find()).map(
+        ({ aid, year, cost, profit, rate, price, pid }) => ({
+          aid,
+          year,
+          cost,
+          profit,
+          rate,
+          price,
+          pid,
+        })
+      );
+      // console.log(after);
+      if (!product)
+        return res.status(422).send({
           message: '未找到该产品',
         });
       const result = product.map((item) => {
         const { pid } = item;
+        const info = after.filter((item) => item.pid === pid);
         const relativeScore = score.filter((item) => item.pid === pid);
         return {
           ...item,
           relativeScore,
+          info,
         };
       });
+
       return res.send(result);
     }
+    console.log(pid);
     // 获取单个产品信息
     const product = await Product.findOne({ pid });
+    const info = (await After.find({ pid })).map(
+      ({ aid, year, cost, profit, rate, price, pid }) => ({
+        aid,
+        year,
+        cost,
+        profit,
+        rate,
+        price,
+        pid,
+      })
+    );
     const score = await Score.find({ pid });
-    if (!product || !score)
+    if (!product)
       return res.status(422).send({
         message: '未找到该产品',
       });
     const result = {
-      ...product,
+      ...product._doc,
+      info,
       score,
     };
     return res.send(result);
   } catch (e) {
+    console.log(e);
     return res.status(500).send({
       message: '服务出错',
     });
   }
 });
 app.get('/user/userinfo', auth, async (req, res) => {
-  res.send(req.user);
+  const { username, sign } = req.user;
+  res.send({ username, sign });
 });
 // 添加产品
 app.post('/product/add', auth, async (req, res) => {
   const { uid } = req.user;
   const { pname, intro, info } = req.body;
+  const pid = new Date().getTime();
   try {
     const product = await Product.create({
-      pid: new Date().getTime(),
+      pid,
       uid,
       pname,
       intro,
@@ -162,22 +202,27 @@ app.post('/product/add', auth, async (req, res) => {
       status: 0,
     });
     if (!product)
-      return res.status(500).send({
+      return res.status(422).send({
         message: '服务出错',
       });
+    info.sort((a, b) => Number(a.year) - Number(b.year));
+
     info.map(async ({ price, profit, cost, year }) => {
+      // if (year && cost && profit) {
       const after = await After.create({
-        price,
+        price: price ?? false,
         profit,
         cost,
         rate: (profit / cost).toFixed(2),
         year,
         aid: new Date().getTime(),
+        pid,
       });
       if (!after)
-        return res.status(500).send({
+        return res.status(422).send({
           message: '服务出错',
         });
+      // }
     });
     return res.send({ message: 'ok' });
   } catch (e) {

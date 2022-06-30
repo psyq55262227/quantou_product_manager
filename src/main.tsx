@@ -15,8 +15,9 @@ import Login from './pages/login';
 
 import changeTheme from './utils/changeTheme';
 import useStorage from './utils/useStorage';
-import './mock';
 import { getToken } from './utils/token';
+import { apiGET } from './api';
+import { generatePermission } from './routes';
 
 const store = createStore(rootReducer);
 
@@ -35,13 +36,16 @@ function Index() {
     }
   }
 
-  function fetchUserInfo() {
-    axios.get('/user/userinfo').then((res) => {
+  const fetchUserInfo = async () => {
+    try {
+      const { data } = await apiGET('/user/userinfo');
       store.dispatch({
         type: 'update-userInfo',
-        payload: { userInfo: res.data },
+        payload: { userInfo: { ...data, permissions: generatePermission(data.sign ? 'admin' : 'user'), } },
       });
-    });
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   useEffect(() => {

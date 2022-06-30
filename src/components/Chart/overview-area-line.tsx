@@ -6,7 +6,7 @@ import CustomTooltip from './customer-tooltip';
 function OverviewAreaLine({
   data,
   loading,
-  name = '总内容量',
+  name = '年利率',
   color = '#4080FF',
 }: {
   data: any[];
@@ -14,6 +14,7 @@ function OverviewAreaLine({
   name?: string;
   color?: string;
 }) {
+  console.log(data)
   return (
     <Spin loading={loading} style={{ width: '100%' }}>
       <Chart
@@ -25,7 +26,7 @@ function OverviewAreaLine({
         className={'chart-wrapper'}
       >
         <Axis
-          name="count"
+          name="rate"
           title
           grid={{
             line: {
@@ -36,19 +37,19 @@ function OverviewAreaLine({
           }}
           label={{
             formatter(text) {
-              return `${Number(text) / 1000}k`;
+              return Number(text);
             },
           }}
         />
-        <Axis name="date" grid={{ line: { style: { stroke: '#E5E8EF' } } }} />
+        <Axis name="year" grid={{ line: { style: { stroke: '#E5E8EF' } } }} />
         <Line
           shape="smooth"
-          position="date*count"
+          position="year*rate"
           size={3}
           color="l (0) 0:#1EE7FF .57:#249AFF .85:#6F42FB"
         />
         <Area
-          position="date*count"
+          position="year*rate"
           shape="smooth"
           color="l (90) 0:rgba(17, 126, 255, 0.5)  1:rgba(17, 128, 255, 0)"
         />

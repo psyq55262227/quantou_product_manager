@@ -6,8 +6,14 @@
   align-items: center;
 }
 .box {
-  display: grid;
-  grid-template-columns: repeat(auto, auto);
-  justify-items: end;
-  gap: 4px;
+  display: flex;
+  flex-direction: column;
+}
+.card {
+  transition-property: all;
+  width: 100%;
+}
+
+.card:hover {
+  transform: translateY(-4px);
 }

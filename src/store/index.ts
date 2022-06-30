@@ -3,6 +3,7 @@ export interface GlobalState {
   settings?: typeof defaultSettings;
   userInfo?: {
     username?: string;
+    sign?: boolean;
     permissions: Record<string, string[]>;
   };
 }

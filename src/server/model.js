@@ -94,6 +94,10 @@ const After = mongoose.model(
         required: true,
         unique: true,
       },
+      pid: {
+        type: Number,
+        required: true,
+      },
       year: {
         type: String,
         required: true,

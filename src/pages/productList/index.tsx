@@ -1,45 +1,73 @@
-import { Card, Link, Pagination } from '@arco-design/web-react'
-import Meta from '@arco-design/web-react/es/Card/meta'
+import { Card, Link, Pagination, Descriptions, Empty } from '@arco-design/web-react'
 import styles from './style/index.module.less'
-import React, { useState } from 'react'
+import React, { useEffect, useState, } from 'react'
+import { apiGET } from '@/api'
+import { getAverageInterestRate } from '@/utils/count'
+import { Status } from '@/utils/status'
 const ProductList = () => {
   const [page, setPage] = useState(1);
-  const data = [
-    1, 2, 3, 4, 5, 6, 7
-  ]
+  const [list, setList] = useState([]);
+
+  const getProductList = async () => {
+    try {
+      const { data } = await apiGET('/product');
+      setList(data);
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  useEffect(() => {
+    getProductList()
+  }, [])
   return (
     <section className={styles.box}>
       <section className={styles.container}>
         {
-          data.slice((page - 1) * 6, page * 6).map((item, i) => (
-            <Link key={i} href="/detail?id=1">
-              <Card
-                hoverable
-                cover={
-                  <div style={{ height: 204, overflow: 'hidden' }}>
-                    <img
-                      style={{ width: '100%', transform: 'translateY(-20px)' }}
-                      alt='dessert'
-                      src='//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp'
-                    />
-                  </div>
-                }
-              >
-                <Meta
-                  title='Card Title'
-                  description={
-                    <>
-                      Card content <br /> Card content
-                    </>
+          list.length === 0 ? <Empty /> :
+            list.slice((page - 1) * 6, page * 6).map(({ pid, pname, status, pull_data, put_data, intro, info }) => (
+              <Link key={pid} href={`/detail?pid=${pid}`} style={{ width: '100%' }}>
+                <Card
+                  className={styles.card}
+                  hoverable
+                  bordered
+                  title={pname}
+                  extra={
+                    <span style={{ color: Status[status].color }}>
+                      {Status[status].text}
+                    </span>
                   }
-                />
-              </Card>
-            </Link>
-          ))
+                >
+                  <Descriptions
+                    // colon=' :'
+                    column={1}
+                    labelStyle={{ paddingRight: 36 }}
+                    data={
+                      [
+                        {
+                          label: '描述',
+                          value: intro
+                        },
+                        {
+                          label: '平均年利率',
+                          value: info.length === 0 ? '暂无数据' : getAverageInterestRate(info).toFixed(2) + '%'
+                        },
+                        {
+                          label: '通过日期',
+                          value: pull_data === -1 ? '暂未通过' : new Date(pull_data).toLocaleTimeString()
+                        },
+                        {
+                          label: '下架日期',
+                          value: put_data === -1 ? '暂未下架' : new Date(put_data).toLocaleTimeString()
+                        }
+                      ]}
+                  />
+                </Card>
+              </Link>
+            ))
         }
-      </section>
-      <Pagination defaultPageSize={6} total={data.length} showJumper hideOnSinglePage onChange={page => setPage(page)} />
-    </section>
+      </section >
+      <Pagination defaultPageSize={6} total={list.length} showJumper hideOnSinglePage onChange={page => setPage(page)} />
+    </section >
   )
 }
 export default ProductList
