@@ -9,6 +9,7 @@ const FormItem = Form.Item;
 export default () => {
   const formRef = useRef();
   const [formData, setFormData] = useState();
+  const [form] = Form.useForm();
   const history = useHistory();
   const handleCreateProduct = async () => {
     try {
@@ -24,7 +25,7 @@ export default () => {
       }
       await apiPOST('/product/add', formData);
       Message.success('创建产品成功')
-      history.push('/')
+      form.clearFields();
     } catch (e) {
       console.log(e)
     }
@@ -34,6 +35,7 @@ export default () => {
       <Form
         layout="horizontal"
         ref={formRef}
+        form={form}
         onValuesChange={(_, v) => {
           setFormData(v);
         }}

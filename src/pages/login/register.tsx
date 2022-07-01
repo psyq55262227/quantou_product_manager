@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom';
 import { Modal, Form, Input, Select, Message } from '@arco-design/web-react';
 import { apiPOST } from '@/api';
+import { setToken } from '@/utils/token';
 const FormItem = Form.Item;
 
 export default ({ visible, setVisible }) => {
@@ -12,7 +13,6 @@ export default ({ visible, setVisible }) => {
   const onOk = async () => {
     form.validate().then(async (res) => {
       setConfirmLoading(true);
-      console.log(res);
       try {
         const { data: { token } } = await apiPOST('/signup', { ...res, sign: false });
         if (!token) {
@@ -20,6 +20,7 @@ export default ({ visible, setVisible }) => {
             content: '注册失败~请稍后重试'
           })
         }
+        setToken(token)
         Message.success({
           content: '注册成功！'
         })
@@ -28,11 +29,6 @@ export default ({ visible, setVisible }) => {
         console.log(e)
       }
       setConfirmLoading(false);
-      // setTimeout(() => {
-      //   Message.success('Success !');
-      //   setVisible(false);
-      //   setConfirmLoading(false);
-      // }, 1500);
     });
   }
 

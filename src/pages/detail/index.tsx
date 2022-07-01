@@ -5,6 +5,7 @@ import { Status } from "@/utils/status";
 import { Card, Skeleton, Descriptions } from "@arco-design/web-react"
 import React, { useEffect, useState } from "react"
 import { useLocation } from 'react-router-dom'
+import DetailTable from "./table";
 
 interface IItem {
   label: string;
@@ -43,10 +44,10 @@ export default () => {
       value: intro
     }, {
       label: '过审日期',
-      value: pull_data === -1 ? '还未过审' : pull_data
+      value: pull_data === -1 ? '暂未过审' : pull_data
     }, {
       label: '下架日期',
-      value: put_data === -1 ? '还未下架' : put_data
+      value: put_data === -1 ? '暂未下架' : put_data
     }, {
       label: '状态',
       value: Status[status].text
@@ -66,7 +67,6 @@ export default () => {
       getTableData(data);
       getChartData(data);
     }
-
   }, [data])
   return (
     <Card
@@ -101,7 +101,7 @@ export default () => {
         {
           chartData && chartData.length > 1 && <OverviewAreaLine data={chartData} loading={loading} />
         }
-
+        <DetailTable data={data ? data.info : []} />
       </Skeleton>
     </Card>
   )
