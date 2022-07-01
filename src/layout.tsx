@@ -10,6 +10,7 @@ import {
   IconList,
   IconApps,
   IconFolderAdd,
+  IconUser,
 } from '@arco-design/web-react/icon';
 import { useSelector } from 'react-redux';
 import qs from 'query-string';
@@ -41,7 +42,9 @@ function getIconFromKey(key) {
     case 'detail':
       return <IconApps className={styles.icon} />;
     case 'create':
-      return <IconFolderAdd className={styles.icon} />
+      return <IconFolderAdd className={styles.icon} />;
+    case 'userList':
+      return <IconUser className={styles.icon} />
     default:
       return <div className={styles['icon-empty']} />;
   }

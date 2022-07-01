@@ -21,6 +21,10 @@ export const routes: Route[] = [
     name: '上传产品',
     key: 'create',
   },
+  {
+    name: '用户列表',
+    key: 'userList',
+  },
 ];
 
 export const getName = (path: string, routes) => {

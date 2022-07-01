@@ -6,7 +6,7 @@ post {{url}}/signup
 {{json}}
 
 {
-    "username": "user",
-    "password":"user",
-    "sign":false
+    "username": "admin",
+    "password":"admin",
+    "sign":true
 }

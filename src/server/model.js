@@ -48,6 +48,11 @@ const Product = mongoose.model(
         type: Number, // 0 待审核 1 不通过 2 通过
         required: true,
       },
+      // 本年是否拿奖
+      price: {
+        type: Boolean,
+        required: true,
+      },
     },
     { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
   )
@@ -79,6 +84,9 @@ const User = mongoose.model(
       sign: {
         type: Boolean,
         // required: true,
+      },
+      isJudge: {
+        type: Boolean,
       },
     },
     // todo的创建时间和修改时间
@@ -112,11 +120,6 @@ const After = mongoose.model(
       },
       rate: {
         type: Number,
-        required: true,
-      },
-      // 本年是否拿奖
-      price: {
-        type: Boolean,
         required: true,
       },
     },

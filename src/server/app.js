@@ -63,6 +63,7 @@ app.post('/signup', async (req, res) => {
     username,
     password,
     sign,
+    isJudge: false,
   });
   // 发放token
   const token = `Bearer ${jwt.sign(
@@ -111,24 +112,24 @@ app.get('/product', auth, async (req, res) => {
     // 获取产品列表
     if (!pid) {
       const product = (await Product.find()).map(
-        ({ pid, pname, intro, put_data, pull_data, status }) => ({
+        ({ pid, pname, intro, put_data, pull_data, price, status }) => ({
           pid,
           pname,
           intro,
           put_data,
           pull_data,
           status,
+          price,
         })
       );
       const score = await Score.find();
       const after = (await After.find()).map(
-        ({ aid, year, cost, profit, rate, price, pid }) => ({
+        ({ aid, year, cost, profit, rate, pid }) => ({
           aid,
           year,
           cost,
           profit,
           rate,
-          price,
           pid,
         })
       );
@@ -154,13 +155,12 @@ app.get('/product', auth, async (req, res) => {
     // 获取单个产品信息
     const product = await Product.findOne({ pid });
     const info = (await After.find({ pid })).map(
-      ({ aid, year, cost, profit, rate, price, pid }) => ({
+      ({ aid, year, cost, profit, rate, pid }) => ({
         aid,
         year,
         cost,
         profit,
         rate,
-        price,
         pid,
       })
     );
@@ -186,6 +186,34 @@ app.get('/user/userinfo', auth, async (req, res) => {
   const { username, sign } = req.user;
   res.send({ username, sign });
 });
+app.get('/user/userList', auth, async (req, res) => {
+  try {
+    const users = await User.find();
+    return res.send(users);
+  } catch (e) {
+    console.log(e);
+  }
+});
+app.post('/user/status', auth, async (req, res) => {
+  const { sign } = req.user;
+  if (!sign) {
+    return res.status(422).send({
+      message: '您没有权限访问该接口',
+    });
+  }
+  const { isJudge, uid } = req.body;
+  try {
+    await User.updateOne({ uid }, { isJudge });
+    res.send({
+      message: 'ok',
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send({
+      message: '服务器出错',
+    });
+  }
+});
 // 添加产品
 app.post('/product/add', auth, async (req, res) => {
   const { uid } = req.user;
@@ -200,6 +228,7 @@ app.post('/product/add', auth, async (req, res) => {
       put_data: -1,
       pull_data: -1,
       status: 0,
+      price: false,
     });
     if (!product)
       return res.status(422).send({
@@ -207,10 +236,9 @@ app.post('/product/add', auth, async (req, res) => {
       });
     info.sort((a, b) => Number(a.year) - Number(b.year));
 
-    info.map(async ({ price, profit, cost, year }) => {
+    info.map(async ({ profit, cost, year }) => {
       // if (year && cost && profit) {
       const after = await After.create({
-        price: price ?? false,
         profit,
         cost,
         rate: (profit / cost).toFixed(2),
@@ -246,12 +274,8 @@ app.post('/product/check', auth, async (req, res) => {
       { pid },
       {
         status: isPass ? 2 : 1,
-        put_data:
-          isPass && exist.status !== 2 ? new Date().getTime() : exist.put_data,
-        pull_data:
-          !isPass && exist.status !== 1
-            ? new Date().getTime()
-            : exist.pull_data,
+        pull_data: isPass ? new Date().getTime() : exist.pull_data,
+        put_data: isPass ? -1 : new Date().getTime(),
       }
     );
     console.log(product);
