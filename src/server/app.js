@@ -248,7 +248,6 @@ app.post('/product/add', auth, async (req, res) => {
       });
     info.sort((a, b) => Number(a.year) - Number(b.year));
     info.map(async ({ profit, cost, year }) => {
-      // if (year && cost && profit) {
       const after = await After.create({
         profit,
         cost,
@@ -273,11 +272,6 @@ app.post('/product/add', auth, async (req, res) => {
 });
 // 上下架
 app.post('/product/check', auth, manage, async (req, res) => {
-  // const { sign } = req.user;
-  // if (!sign)
-  //   return res.status(403).send({
-  //     message: '您暂时没有访问该接口的权限',
-  //   });
   const { pid, isPass } = req.body;
   try {
     const exist = await Product.findOne({ pid });
@@ -306,7 +300,7 @@ app.post('/product/price', auth, manage, async (req, res) => {
   const { price, pid } = req.body;
   console.log(price);
   try {
-    const data = await Product.updateOne({ pid }, { price });
+    await Product.updateOne({ pid }, { price });
     return res.send({
       message: 'ok',
     });
