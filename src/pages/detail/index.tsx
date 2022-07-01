@@ -17,7 +17,6 @@ interface IItem {
 }
 export default () => {
   const location = useLocation();
-  const [pid, setPid] = useState();
   const [data, setData] = useState();
   const [tableData, setTableData] = useState<IItem[]>();
   const [score, setScore] = useState(0);
@@ -32,16 +31,12 @@ export default () => {
       map.set(k, v)
     });
     const pid = map.get('pid')
-    setPid(pid)
     return pid;
   }
   const getDetail = async () => {
-    const pid = getParams();
     setLoading(true)
     try {
-      console.log('pid', pid)
-      const { data } = await apiGET('/product', { pid })
-      console.log(data)
+      const { data } = await apiGET('/product', { pid: getParams() })
       setData(data)
       getDefaultScore(data.score)
       setLoading(false)
@@ -80,13 +75,14 @@ export default () => {
     setChartData(data.info.map(({ year, rate }) => ({ year, rate })))
   }
   const getDefaultScore = (data) => {
-    const { sc } = data.find(({ bid }) => bid === userInfo.uid)
-    console.log
-    setScore(sc)
+    const res = data.find(({ bid }) => bid === userInfo.uid)
+    if (res) {
+      setScore(res.sc)
+    }
   }
   const handleChangeStatus = async (status) => {
     try {
-      await apiPOST('/product/check', { pid, isPass: status });
+      await apiPOST('/product/check', { pid: getParams(), isPass: status });
       getDetail()
     } catch (e) {
       console.log(e);
@@ -94,7 +90,7 @@ export default () => {
   }
   const handleChangePrice = async (price) => {
     try {
-      await apiPOST('/product/price', { pid, price })
+      await apiPOST('/product/price', { pid: getParams(), price })
       getDetail();
       Message.success('获奖情况更新成功！')
     } catch (e) {
@@ -104,7 +100,7 @@ export default () => {
   const handleChangeScore = async (sc) => {
     setScore(sc)
     try {
-      await apiPOST('/product/score', { pid, sc });
+      await apiPOST('/product/score', { pid: getParams(), sc });
       getDetail();
       Message.success('评分成功！')
     } catch (e) {
