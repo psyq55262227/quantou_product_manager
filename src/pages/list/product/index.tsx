@@ -54,7 +54,7 @@ const ProductList = () => {
                       className={styles.card}
                       hoverable
                       bordered
-                      title={pname}
+                      title={<h3>{pname}</h3>}
                       extra={
                         <span style={{ color: Status[status].color }}>
                           {Status[status].text}

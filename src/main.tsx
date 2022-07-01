@@ -7,7 +7,6 @@ import { ConfigProvider } from '@arco-design/web-react';
 import zhCN from '@arco-design/web-react/es/locale/zh-CN';
 import enUS from '@arco-design/web-react/es/locale/en-US';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import axios from 'axios';
 import rootReducer from './store';
 import PageLayout from './layout';
 import { GlobalContext } from './context';
@@ -39,12 +38,10 @@ function Index() {
   const fetchUserInfo = async () => {
     try {
       const { data } = await apiGET('/user/userinfo');
-      console.log(data)
       store.dispatch({
         type: 'update-userInfo',
         payload: { userInfo: { ...data, permissions: generatePermission(data.sign ? 'admin' : 'user'), } },
       });
-      console.log({ userInfo: { ...data, permissions: generatePermission(data.sign ? 'admin' : 'user'), } })
     } catch (e) {
       console.log(e)
     }

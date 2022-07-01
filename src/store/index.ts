@@ -19,13 +19,6 @@ const initialState: GlobalState = {
 
 export default function store(state = initialState, action) {
   switch (action.type) {
-    case 'update-settings': {
-      const { settings } = action.payload;
-      return {
-        ...state,
-        settings,
-      };
-    }
     case 'update-userInfo': {
       const { userInfo = initialState.userInfo, userLoading } = action.payload;
       return {
