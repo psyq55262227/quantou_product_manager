@@ -128,8 +128,10 @@ export default () => {
       <Card
         style={{ width: '100%', paddingTop: '16px' }}
         extra={
+          // 权限控制，仅管理员可显示
           <AuthWrap>
             <Space>
+              {/* 判断是否有奖项 */}
               {
                 data && (data.price ?
                   <Button
@@ -143,6 +145,7 @@ export default () => {
                   >颁发奖项</Button>)
               }
               {
+                // status，0待审核，1不通过，2通过
                 data && data.status !== 2 &&
                 <Button
                   type="outline"
@@ -173,6 +176,7 @@ export default () => {
           >
             <Space>
               <h2>{data ? data.pname : ''}</h2>
+              {/* 权限管理，仅评委可查看 */}
               <AuthWrap role='judge'>
                 <Rate grading allowHalf onChange={(sc) => handleChangeScore(sc)} defaultValue={score} />
               </AuthWrap>

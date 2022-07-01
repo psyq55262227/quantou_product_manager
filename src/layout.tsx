@@ -67,7 +67,6 @@ function PageLayout() {
   const pathname = history.location.pathname;
   const currentComponent = qs.parseUrl(pathname).url.slice(1);
   const locale = useLocale();
-  const settings = useSelector((state: GlobalState) => state.settings);
   const userInfo = useSelector((state: GlobalState) => state.userInfo);
 
   const [routes, defaultRoute] = useRoute(userInfo?.permissions);
@@ -85,9 +84,9 @@ function PageLayout() {
   const navbarHeight = 60;
   const menuWidth = collapsed ? 48 : settings.menuWidth;
 
-  const showNavbar = settings.navbar && urlParams.navbar !== false;
-  const showMenu = settings.menu && urlParams.menu !== false;
-  const showFooter = settings.footer && urlParams.footer !== false;
+  const showNavbar = urlParams.navbar !== false;
+  const showMenu = urlParams.menu !== false;
+  const showFooter = urlParams.footer !== false;
 
   const flattenRoutes = useMemo(() => getFlattenRoutes(routes) || [], [routes]);
 
