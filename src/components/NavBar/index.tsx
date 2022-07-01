@@ -19,10 +19,8 @@ import { useHistory } from 'react-router-dom'
 import { GlobalState } from '@/store';
 import { GlobalContext } from '@/context';
 import useLocale from '@/utils/useLocale';
-import Logo from '@/assets/logo.svg';
 import IconButton from './IconButton';
 import styles from './style/index.module.less';
-import Settings from '../Settings';
 import { delToken } from '@/utils/token';
 
 function Navbar({ show }: { show: boolean }) {
@@ -42,20 +40,6 @@ function Navbar({ show }: { show: boolean }) {
       case 'logout':
         logout();
     }
-  }
-
-
-
-  if (!show) {
-    return (
-      <div className={styles['fixed-settings']}>
-        <Settings
-          trigger={
-            <Button icon={<IconSettings />} type="primary" size="large" />
-          }
-        />
-      </div>
-    );
   }
 
   const droplist = (

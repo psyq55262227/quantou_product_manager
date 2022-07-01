@@ -44,12 +44,8 @@ export default () => {
           label='产品名' field='pname' rules={[{ required: true }]}>
           <Input placeholder='请输入产品名' />
         </FormItem>
-        {/* <FormItem field="pic" label='产品图片地址' rules={[{ required: true }]}>
-          <Input placeholder='请输入产品图片地址' defaultValue="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/3ee5f13fb09879ecb5185e440cef6eb9.png~tplv-uwbnlip3yd-webp.webp" />
-        </FormItem> */}
         <FormItem label='产品描述' field="intro" rules={[{ required: true }]}>
           <Input placeholder='请输入产品描述' />
-          {/* <TextArea allowClear placeholder='请输入产品描述' style={{ minHeight: 64, width: 350 }} autoSize /> */}
         </FormItem>
         <FormItem label="产品年利率信息">
           <Form.List field='info'>
@@ -81,14 +77,6 @@ export default () => {
                               noStyle
                             >
                               <InputNumber placeholder="请输入该年利润" suffix={'￥'} />
-                            </Form.Item>
-                            <Form.Item
-                              field={item.field + '.price'}
-                              rules={[{ required: true }]}
-                              noStyle
-                            >
-                              <Checkbox>该年获奖</Checkbox>
-                              {/* <InputNumber placeholder="请输入该年利润" suffix={'￥'} /> */}
                             </Form.Item>
                             <Button
                               icon={<IconDelete />}

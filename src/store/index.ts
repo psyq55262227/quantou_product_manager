@@ -4,6 +4,8 @@ export interface GlobalState {
   userInfo?: {
     username?: string;
     sign?: boolean;
+    isJudge?: boolean;
+    uid?: number;
     permissions: Record<string, string[]>;
   };
 }

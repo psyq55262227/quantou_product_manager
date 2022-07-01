@@ -15,10 +15,9 @@ export default () => {
   }
   const handleChangeJudgeStatus = async (uid, isJudge) => {
     try {
-      const { data } = await apiPOST('/user/status', { isJudge, uid });
+      await apiPOST('/user/status', { isJudge, uid });
+      getUserList()
       Message.success('设置评委成功')
-
-      console.log(data)
     } catch (e) {
       console.log(e)
     }
@@ -47,7 +46,7 @@ export default () => {
           identity === 1 ?
             <Button type='primary' status="danger"
               onClick={() => handleChangeJudgeStatus(uid, false)}
-            >取消评委资格
+            >取消资格
             </Button> :
             <Button type='primary'
               onClick={() => handleChangeJudgeStatus(uid, true)}

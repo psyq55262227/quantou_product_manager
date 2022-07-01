@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom';
 import { Modal, Form, Input, Select, Message } from '@arco-design/web-react';
 import { apiPOST } from '@/api';
 import { setToken } from '@/utils/token';
@@ -8,7 +7,6 @@ const FormItem = Form.Item;
 export default ({ visible, setVisible }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
-  const history = useHistory();
 
   const onOk = async () => {
     form.validate().then(async (res) => {
@@ -24,7 +22,7 @@ export default ({ visible, setVisible }) => {
         Message.success({
           content: '注册成功！'
         })
-        history.push('/')
+        window.location.href = '/'
       } catch (e) {
         console.log(e)
       }

@@ -44,6 +44,26 @@ const auth = async (req, res, next) => {
   req.user = user;
   next();
 };
+// 鉴定是不是管理员
+const manage = async (req, res, next) => {
+  const { sign } = req.user;
+  if (!sign) {
+    return res.status(422).send({
+      message: '您没有权限访问该接口',
+    });
+  }
+  next();
+};
+// 鉴定是不是评委
+const judge = async (req, res, next) => {
+  const { isJudge } = req.user;
+  if (!isJudge) {
+    return res.status(422).send({
+      message: '您没有权限访问该接口',
+    });
+  }
+  next();
+};
 // 注册
 app.post('/signup', async (req, res) => {
   const { username, password, sign } = req.body;
@@ -133,7 +153,6 @@ app.get('/product', auth, async (req, res) => {
           pid,
         })
       );
-      // console.log(after);
       if (!product)
         return res.status(422).send({
           message: '未找到该产品',
@@ -151,7 +170,6 @@ app.get('/product', auth, async (req, res) => {
 
       return res.send(result);
     }
-    console.log(pid);
     // 获取单个产品信息
     const product = await Product.findOne({ pid });
     const info = (await After.find({ pid })).map(
@@ -183,8 +201,8 @@ app.get('/product', auth, async (req, res) => {
   }
 });
 app.get('/user/userinfo', auth, async (req, res) => {
-  const { username, sign } = req.user;
-  res.send({ username, sign });
+  const { username, sign, isJudge, uid } = req.user;
+  res.send({ username, sign, isJudge, uid });
 });
 app.get('/user/userList', auth, async (req, res) => {
   try {
@@ -194,13 +212,7 @@ app.get('/user/userList', auth, async (req, res) => {
     console.log(e);
   }
 });
-app.post('/user/status', auth, async (req, res) => {
-  const { sign } = req.user;
-  if (!sign) {
-    return res.status(422).send({
-      message: '您没有权限访问该接口',
-    });
-  }
+app.post('/user/status', auth, manage, async (req, res) => {
   const { isJudge, uid } = req.body;
   try {
     await User.updateOne({ uid }, { isJudge });
@@ -235,7 +247,6 @@ app.post('/product/add', auth, async (req, res) => {
         message: '服务出错',
       });
     info.sort((a, b) => Number(a.year) - Number(b.year));
-
     info.map(async ({ profit, cost, year }) => {
       // if (year && cost && profit) {
       const after = await After.create({
@@ -261,12 +272,12 @@ app.post('/product/add', auth, async (req, res) => {
   }
 });
 // 上下架
-app.post('/product/check', auth, async (req, res) => {
-  const { sign } = req.user;
-  if (!sign)
-    return res.status(403).send({
-      message: '您暂时没有访问该接口的权限',
-    });
+app.post('/product/check', auth, manage, async (req, res) => {
+  // const { sign } = req.user;
+  // if (!sign)
+  //   return res.status(403).send({
+  //     message: '您暂时没有访问该接口的权限',
+  //   });
   const { pid, isPass } = req.body;
   try {
     const exist = await Product.findOne({ pid });
@@ -290,25 +301,43 @@ app.post('/product/check', auth, async (req, res) => {
     });
   }
 });
-// 评委评分
-app.post('/product/score', auth, async (req, res) => {
-  const { sign, uid } = req.user;
-  if (!sign)
-    return res.status(403).send({
-      message: '您暂时没有访问该接口的权限',
+// 得奖标记
+app.post('/product/price', auth, manage, async (req, res) => {
+  const { price, pid } = req.body;
+  console.log(price);
+  try {
+    const data = await Product.updateOne({ pid }, { price });
+    return res.send({
+      message: 'ok',
     });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      message: '服务出错',
+    });
+  }
+});
+// 评委评分
+app.post('/product/score', auth, judge, async (req, res) => {
+  const { uid } = req.user;
   const { pid, sc } = req.body;
   try {
-    const score = await Score.create({
-      sid: new Date().getTime(),
-      sc,
-      pid,
-      bid: uid,
-    });
-    if (score) return res.send({ message: 'ok' });
-    return res.status(422).send({
-      message: '不存在该产品或操作失败',
-    });
+    const { modifiedCount } = await Score.updateOne(
+      {
+        pid,
+        bid: uid,
+      },
+      { sc }
+    );
+    if (modifiedCount < 1) {
+      await Score.create({
+        sid: new Date().getTime(),
+        sc,
+        pid,
+        bid: uid,
+      });
+    }
+    return res.send({ message: 'ok' });
   } catch (e) {
     console.log(e);
     return res.status(500).send({

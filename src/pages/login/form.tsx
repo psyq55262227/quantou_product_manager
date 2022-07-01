@@ -17,14 +17,12 @@ import styles from './style/index.module.less';
 import { apiPOST } from '@/api';
 import { setToken } from '@/utils/token';
 import Register from './register';
-import { useHistory } from 'react-router-dom'
 
 export default function LoginForm() {
   const formRef = useRef<FormInstance>();
   const [visible, setVisible] = useState(false)
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const history = useHistory();
   const [loginParams, setLoginParams, removeLoginParams] =
     useStorage('loginParams');
 
@@ -43,7 +41,7 @@ export default function LoginForm() {
       } else {
         removeLoginParams();
       }
-      history.push('/')
+      window.location.href = "/"
     } catch (e) {
       console.log(e)
       setErrorMessage(t['login.form.login.errMsg']);
@@ -53,8 +51,6 @@ export default function LoginForm() {
 
   function onSubmitClick() {
     formRef.current.validate().then((values) => {
-      console.log(values)
-      console.log(new Date().getTime())
       login(values);
     });
   }

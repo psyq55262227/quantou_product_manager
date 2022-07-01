@@ -10,8 +10,19 @@ export type Route = AuthParams & {
 
 export const routes: Route[] = [
   {
-    name: '产品列表',
-    key: 'productList',
+    name: '列表',
+    key: 'list',
+    children: [
+      {
+        name: '产品列表',
+        key: 'list/product',
+      },
+      {
+        name: '用户列表',
+        key: 'list/user',
+        requiredPermissions: [{ resource: '用户列表', actions: ['*'] }],
+      },
+    ],
   },
   {
     name: '产品详情',
@@ -20,10 +31,6 @@ export const routes: Route[] = [
   {
     name: '上传产品',
     key: 'create',
-  },
-  {
-    name: '用户列表',
-    key: 'userList',
   },
 ];
 

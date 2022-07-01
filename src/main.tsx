@@ -39,10 +39,12 @@ function Index() {
   const fetchUserInfo = async () => {
     try {
       const { data } = await apiGET('/user/userinfo');
+      console.log(data)
       store.dispatch({
         type: 'update-userInfo',
         payload: { userInfo: { ...data, permissions: generatePermission(data.sign ? 'admin' : 'user'), } },
       });
+      console.log({ userInfo: { ...data, permissions: generatePermission(data.sign ? 'admin' : 'user'), } })
     } catch (e) {
       console.log(e)
     }
