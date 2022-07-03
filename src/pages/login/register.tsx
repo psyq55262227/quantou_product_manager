@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal, Form, Input, Select, Message } from '@arco-design/web-react';
+import { Modal, Form, Input, Message } from '@arco-design/web-react';
 import { apiPOST } from '@/api';
 import { setToken } from '@/utils/token';
 const FormItem = Form.Item;

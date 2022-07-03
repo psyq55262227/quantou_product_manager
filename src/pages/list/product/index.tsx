@@ -16,19 +16,27 @@ const ProductList = () => {
   const [selected, dispatch] = useReducer((state, { type }) => {
     setRadioValue(type)
     switch (type) {
+      // 0 1 2 3 等，对应radioOption数组下标
       case 0:
+        // 返回全部产品
         return list;
-      case 2:
-        return list.filter(({ info }) => getAverageInterestRate(info) < 0.5)
       case 1:
+        // 返回拳头产品
         return list.filter(({ status }) => status === 2)
+      case 2:
+        // 返回风险产品
+        return list.filter(({ info }) => getAverageInterestRate(info) < 0.5)
       case 3:
+        // 返回待审核的产品
         return list.filter(({ status }) => status === 0)
       case 4:
+        // 返回下架的产品
         return list.filter(({ status }) => status === 1)
       default:
+        // 保持原样
         return state;
     }
+    // 初始值是list
   }, list ?? [])
 
   const RadioGroup = Radio.Group;
@@ -66,6 +74,7 @@ const ProductList = () => {
 
       <section className={styles.box}>
         {
+          // 若搜索后的结果长度为0
           selected.filter(({ pname }) => pname.indexOf(keyWord) !== -1).length === 0 ?
             <Card>
               <Empty />
@@ -73,6 +82,7 @@ const ProductList = () => {
             :
             <section className={styles.container}>
               {
+                // filter(({ pname }) => pname.indexOf(keyWord) !== -1)，根据关键词keyWord对产品进行查找
                 selected.filter(({ pname }) => pname.indexOf(keyWord) !== -1).slice((page - 1) * 6, page * 6).map(({ pid, pname, status, pull_data, put_data, intro, info }) => (
                   <Link key={pid} to={`/detail?pid=${pid}`} style={{ width: '100%', textDecoration: 'none' }}>
                     <Card
@@ -86,6 +96,7 @@ const ProductList = () => {
                         </span>
                       }
                     >
+                      {/* 上方的数值概况描述部分 */}
                       <Descriptions
                         column={1}
                         labelStyle={{ paddingRight: 36 }}
@@ -115,6 +126,7 @@ const ProductList = () => {
               }
             </section >
         }
+        {/* 分页组件，属性含义参见arco文档中的Pagination组件 */}
         <Pagination defaultPageSize={6} total={list.length} showJumper hideOnSinglePage onChange={page => setPage(page)} />
       </section >
     </>

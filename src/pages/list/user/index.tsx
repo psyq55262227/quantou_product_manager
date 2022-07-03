@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 
 export default () => {
   const [tableData, setTableData] = useState();
+  // 获取用户列表
   const getUserList = async () => {
     try {
       const { data } = await apiGET('/user/userList');
@@ -12,6 +13,7 @@ export default () => {
       console.log(e)
     }
   }
+  // 改变用户是否为评委的状态
   const handleChangeJudgeStatus = async (uid, isJudge) => {
     try {
       await apiPOST('/user/status', { isJudge, uid });
@@ -21,9 +23,11 @@ export default () => {
       console.log(e)
     }
   }
+  // 挂载时获取用户列表
   useEffect(() => {
     getUserList();
   }, [])
+  // 该处数据格式参见table组件的columns
   const columns: TableColumnProps[] = [
     {
       title: '用户id',
