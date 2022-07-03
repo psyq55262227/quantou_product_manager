@@ -255,6 +255,7 @@ app.post('/product/add', auth, async (req, res) => {
         year,
         aid: new Date().getTime(),
         pid,
+        _uid: new Date().getTime() + year,
       });
       if (!after)
         return res.status(422).send({
