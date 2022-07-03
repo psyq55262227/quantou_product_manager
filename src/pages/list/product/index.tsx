@@ -1,4 +1,4 @@
-import { Card, Pagination, Descriptions, Empty, Radio } from '@arco-design/web-react'
+import { Card, Pagination, Descriptions, Empty, Radio, Input } from '@arco-design/web-react'
 import styles from './style/index.module.less'
 import React, { useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { Status } from '@/utils/status'
 const ProductList = () => {
   const [page, setPage] = useState(1);
   const [list, setList] = useState([]);
+  const [keyWord, setKeyWord] = useState('');
   const [radioValue, setRadioValue] = useState(0);
   const radioOption = [
     '全部', '拳头产品', '风险产品'
@@ -44,28 +45,32 @@ const ProductList = () => {
   }, [list])
   return (
     <>
-      <RadioGroup
-        type='button'
-        defaultValue={0}
-        style={{ marginRight: 20, marginBottom: 20 }}
-      >
-        {
-          radioOption.map((item, i) => {
-            console.log(i)
-            return <Radio key={i} value={i} onClick={() => dispatch({ type: i })}>{item}</Radio>
-          })
-        }
-      </RadioGroup>
+      <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <RadioGroup
+          type='button'
+          defaultValue={0}
+          style={{ marginRight: 20, marginBottom: 20 }}
+        >
+          {
+            radioOption.map((item, i) => {
+              console.log(i)
+              return <Radio key={i} value={i} onClick={() => dispatch({ type: i })}>{item}</Radio>
+            })
+          }
+        </RadioGroup>
+        <Input size="small" onChange={(e) => setKeyWord(e)} style={{ width: 350 }} allowClear placeholder='请输入产品名称' />
+      </section>
+
       <section className={styles.box}>
         {
-          selected.length === 0 ?
+          selected.filter(({ pname }) => pname.indexOf(keyWord) !== -1).length === 0 ?
             <Card>
               <Empty />
             </Card>
             :
             <section className={styles.container}>
               {
-                selected.slice((page - 1) * 6, page * 6).map(({ pid, pname, status, pull_data, put_data, intro, info }) => (
+                selected.filter(({ pname }) => pname.indexOf(keyWord) !== -1).slice((page - 1) * 6, page * 6).map(({ pid, pname, status, pull_data, put_data, intro, info }) => (
                   <Link key={pid} to={`/detail?pid=${pid}`} style={{ width: '100%', textDecoration: 'none' }}>
                     <Card
                       className={styles.card}
