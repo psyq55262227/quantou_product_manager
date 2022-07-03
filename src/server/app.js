@@ -253,9 +253,9 @@ app.post('/product/add', auth, async (req, res) => {
         cost,
         rate: (profit / cost).toFixed(2),
         year,
-        aid: new Date().getTime(),
+        aid: pid + Number(year),
         pid,
-        _uid: new Date().getTime() + year,
+        _uid: pid + Number(year),
       });
       if (!after)
         return res.status(422).send({

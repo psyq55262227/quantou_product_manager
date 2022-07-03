@@ -19,7 +19,7 @@ export default () => {
       if (!info) return Message.error('请填写完整信息')
       for (let i = 0; i < info.length; i++) {
         const { year, cost, profit } = info[i];
-        if (!year || !cost || !profit) return Message.error('请填写完整信息')
+        if (year === undefined || cost === undefined || profit === undefined) return Message.error('请填写完整信息')
         if (yearMap.has(year)) return Message.error('年利率信息请勿重复填写年份')
         yearMap.set(year, year)
       }
