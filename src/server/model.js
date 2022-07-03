@@ -137,7 +137,7 @@ const Score = mongoose.model(
         unique: true,
       },
       sc: {
-        type: Number,
+        type: Array,
         required: true,
       },
       bid: {

@@ -11,7 +11,7 @@ const ProductList = () => {
   const [keyWord, setKeyWord] = useState('');
   const [radioValue, setRadioValue] = useState(0);
   const radioOption = [
-    '全部', '拳头产品', '风险产品'
+    '全部', '拳头产品', '风险产品', '待审产品', '下架产品'
   ]
   const [selected, dispatch] = useReducer((state, { type }) => {
     setRadioValue(type)
@@ -22,6 +22,12 @@ const ProductList = () => {
         return list.filter(({ info }) => getAverageInterestRate(info) < 0.5)
       case 1:
         return list.filter(({ status }) => status === 2)
+      case 3:
+        return list.filter(({ status }) => status === 0)
+      case 4:
+        return list.filter(({ status }) => status === 1)
+      default:
+        return state;
     }
   }, list ?? [])
 
