@@ -1,6 +1,6 @@
 import { Card, Pagination, Descriptions, Empty, Radio } from '@arco-design/web-react'
 import styles from './style/index.module.less'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiGET } from '@/api'
 import { getAverageInterestRate } from '@/utils/count'
@@ -8,8 +8,21 @@ import { Status } from '@/utils/status'
 const ProductList = () => {
   const [page, setPage] = useState(1);
   const [list, setList] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const [isAll, setIsAll] = useState(true);
+  const [radioValue, setRadioValue] = useState(0);
+  const radioOption = [
+    '全部', '拳头产品', '风险产品'
+  ]
+  const [selected, dispatch] = useReducer((state, { type }) => {
+    setRadioValue(type)
+    switch (type) {
+      case 0:
+        return list;
+      case 2:
+        return list.filter(({ info }) => getAverageInterestRate(info) < 0.5)
+      case 1:
+        return list.filter(({ status }) => status === 2)
+    }
+  }, list ?? [])
 
   const RadioGroup = Radio.Group;
 
@@ -26,18 +39,22 @@ const ProductList = () => {
   }, [])
   useEffect(() => {
     if (list) {
-      setSelected(isAll ? list : list.filter(({ info }) => getAverageInterestRate(info) < 0.5))
+      dispatch({ type: radioValue })
     }
-  }, [isAll, list])
+  }, [list])
   return (
     <>
       <RadioGroup
         type='button'
-        defaultValue='all'
+        defaultValue={0}
         style={{ marginRight: 20, marginBottom: 20 }}
       >
-        <Radio value='all' onClick={() => setIsAll(true)}>全部</Radio>
-        <Radio value='danger' onClick={() => setIsAll(false)}>风险产品</Radio>
+        {
+          radioOption.map((item, i) => {
+            console.log(i)
+            return <Radio key={i} value={i} onClick={() => dispatch({ type: i })}>{item}</Radio>
+          })
+        }
       </RadioGroup>
       <section className={styles.box}>
         {
