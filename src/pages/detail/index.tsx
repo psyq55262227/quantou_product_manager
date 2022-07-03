@@ -18,7 +18,7 @@ interface IItem {
 }
 export default () => {
   const location = useLocation();
-  const scoreDesc = ['类型1', '类型2', '类型3']
+  const scoreDesc = ['利润评分', '营收评分', '稳定性评分']
   const [data, setData] = useState();
   const [tableData, setTableData] = useState<IItem[]>();
   const [score, setScore] = useState([]);
