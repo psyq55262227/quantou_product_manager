@@ -10,22 +10,22 @@ const DetailTable = ({ data }) => {
       // data中对应的键名
       dataIndex: 'year',
       // 排序条件
-      sorter: (a, b) => a.year - b.year,
+      sorter: (a, b) => Number(a.year) - Number(b.year),
     },
     {
       title: '年成本',
       dataIndex: 'cost',
-      sorter: (a, b) => a.year - b.year,
+      sorter: (a, b) => Number(a.cost) - Number(b.cost),
     },
     {
       title: '年利润',
       dataIndex: 'profit',
-      sorter: (a, b) => a.year - b.year,
+      sorter: (a, b) => Number(a.profit) - Number(b.profit),
     },
     {
       title: '年利率',
       dataIndex: 'rate',
-      sorter: (a, b) => a.year - b.year,
+      sorter: (a, b) => Number(a.rate) - Number(b.rate),
       // 根据条件筛选
       filters: [
         {
@@ -42,20 +42,6 @@ const DetailTable = ({ data }) => {
         return row.rate > value
       },
     },
-    // {
-    //   title: '是否获奖',
-    //   dataIndex: 'price',
-    //   // 重写该属性对应的html渲染方式
-    //   render: (col, { price }) => <span>{price ? '是' : '否'}</span>,
-    //   filters: [
-    //     {
-    //       text: '只看获奖',
-    //       value: true,
-    //     },
-    //   ],
-    //   onFilter: (value, row) => row.price === true,
-    //   filterMultiple: false,
-    // }
   ];
   return (
     <Table columns={columns} data={data} stripe />

@@ -7,7 +7,6 @@ export default () => {
   const getUserList = async () => {
     try {
       const { data } = await apiGET('/user/userList');
-      console.log(data)
       setTableData(data.map(({ uid, username, sign, isJudge }) => ({ uid, username, identity: sign ? 2 : isJudge ? 1 : 0 })))
     } catch (e) {
       console.log(e)

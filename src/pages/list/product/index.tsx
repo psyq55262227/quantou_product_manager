@@ -58,10 +58,7 @@ const ProductList = () => {
           style={{ marginRight: 20, marginBottom: 20 }}
         >
           {
-            radioOption.map((item, i) => {
-              console.log(i)
-              return <Radio key={i} value={i} onClick={() => dispatch({ type: i })}>{item}</Radio>
-            })
+            radioOption.map((item, i) => (<Radio key={i} value={i} onClick={() => dispatch({ type: i })}>{item}</Radio>))
           }
         </RadioGroup>
         <Input size="small" onChange={(e) => setKeyWord(e)} style={{ width: 350 }} allowClear placeholder='请输入产品名称' />

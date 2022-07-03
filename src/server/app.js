@@ -284,7 +284,6 @@ app.post('/product/check', auth, manage, async (req, res) => {
         put_data: isPass ? -1 : new Date().getTime(),
       }
     );
-    console.log(product);
     if (product) return res.send({ message: 'ok' });
     return res.status(422).send({
       message: '不存在该产品或操作失败',
@@ -299,7 +298,6 @@ app.post('/product/check', auth, manage, async (req, res) => {
 // 得奖标记
 app.post('/product/price', auth, manage, async (req, res) => {
   const { price, pid } = req.body;
-  console.log(price);
   try {
     await Product.updateOne({ pid }, { price });
     return res.send({

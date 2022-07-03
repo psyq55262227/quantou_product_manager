@@ -2,18 +2,14 @@ import { apiPOST } from "@/api";
 import { Form, Input, Checkbox, Button, Card, Space, DatePicker, InputNumber, Message } from "@arco-design/web-react"
 import { IconDelete } from "@arco-design/web-react/icon";
 import React, { useRef, useState } from "react"
-import { useHistory } from 'react-router-dom'
 const FormItem = Form.Item;
-// const TextArea = Input.TextArea;
 
 export default () => {
   const formRef = useRef();
   const [formData, setFormData] = useState();
   const [form] = Form.useForm();
-  const history = useHistory();
   const handleCreateProduct = async () => {
     try {
-      console.log(formData)
       const { info } = formData;
       const yearMap = new Map();
       if (!info) return Message.error('请填写完整信息')
