@@ -77,46 +77,50 @@ export default function LoginForm() {
         layout="vertical"
         ref={formRef}
         initialValues={{ username: 'admin', password: 'admin' }}
+        style={{ width: 'max-content' }}
       >
-        <Form.Item
-          field="username"
-          rules={[{ required: true, message: t['login.form.username.errMsg'] }]}
-        >
-          <Input
-            prefix={<IconUser />}
-            placeholder={t['login.form.username.placeholder']}
-            onPressEnter={onSubmitClick}
-          />
-        </Form.Item>
-        <Form.Item
-          field="password"
-          rules={[{ required: true, message: t['login.form.password.errMsg'] }]}
-        >
-          <Input.Password
-            prefix={<IconLock />}
-            placeholder={t['login.form.password.placeholder']}
-            onPressEnter={onSubmitClick}
-          />
-        </Form.Item>
-        <Space size={16} direction="vertical">
-          <div className={styles['login-form-password-actions']}>
-            <Checkbox checked={rememberPassword} onChange={setRememberPassword}>
-              {t['login.form.rememberPassword']}
-            </Checkbox>
-            <Link>{t['login.form.forgetPassword']}</Link>
-          </div>
-          <Button type="primary" long onClick={onSubmitClick} loading={loading}>
-            {t['login.form.login']}
-          </Button>
-          <Button
-            type="text"
-            long
-            onClick={() => setVisible(true)}
-            className={styles['login-form-register-btn']}
+        <Space>
+          <Form.Item
+            field="username"
+            rules={[{ required: true, message: t['login.form.username.errMsg'] }]}
           >
-            {t['login.form.register']}
-          </Button>
+            <Input
+              prefix={<IconUser />}
+              placeholder={t['login.form.username.placeholder']}
+              onPressEnter={onSubmitClick}
+            />
+          </Form.Item>
+          <Form.Item
+            field="password"
+            rules={[{ required: true, message: t['login.form.password.errMsg'] }]}
+          >
+            <Input.Password
+              prefix={<IconLock />}
+              placeholder={t['login.form.password.placeholder']}
+              onPressEnter={onSubmitClick}
+            />
+          </Form.Item>
+          <Space size={16} direction="vertical">
+            <div className={styles['login-form-password-actions']}>
+              <Checkbox checked={rememberPassword} onChange={setRememberPassword}>
+                {t['login.form.rememberPassword']}
+              </Checkbox>
+              <Link>{t['login.form.forgetPassword']}</Link>
+            </div>
+
+          </Space>
         </Space>
+        <Button type="primary" long onClick={onSubmitClick} loading={loading}>
+          {t['login.form.login']}
+        </Button>
+        <Button
+          type="text"
+          long
+          onClick={() => setVisible(true)}
+          className={styles['login-form-register-btn']}
+        >
+          {t['login.form.register']}
+        </Button>
       </Form>
       <Register visible={visible} setVisible={setVisible} />
     </div>
