@@ -59,7 +59,10 @@ export default () => {
   ]
   return (
     <Card>
-      <Table columns={columns} data={tableData} />
+      <Table columns={columns} data={tableData} border={{
+        wrapper: true,
+        cell: true,
+      }} />
     </Card>
   )
 }
